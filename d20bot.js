@@ -20,38 +20,54 @@ client.on("message", (message) => {
     const args = message.content.slice(prefix.length).trim().split(/ +/g);
     const command = args.shift(); // can append .toLowerCase() so command case doesn't matter (e.g. !ping and !Ping are the same)
     
-    // Conditionals
+    // Parse commands (uses prefix)
     if (command === 'd20') {
-        // Initialize random number
+        // Initialize random number (ouput)
         var randomNum;
+        var maxNum;
+        var minNum;
         
-        // check number of arguments
+        // Check number of arguments
         var argLength = args.length;
   
-        // Validate arguments are numbers? Struggling here
-        // for (var i = 0; i < argLength; i++){
-        //     console.log("Checking arguments");
-        //     if (Number.isNaN(args[i])) {
-        //         console.log("Not a number!");
-        //         //return;
-        //     }
-        // }
+        // Validate Arguments
+        for (var i = 0; i < argLength; i++){
+            // If an argument is not a number or is negative, terminate the function
+            if (isNaN(args[i]) || (parseInt(args[i]) <= 0)){
+                return;
+            }
+            // If it is a number, make 
+        }
 
         // If 0 arguments, do standard 1 - 20 roll
         if (argLength === 0) {
             randomNum = Math.floor(Math.random() * 20 + 1);
+            console.log("Rolling from 1 to 20");
         } 
         // If 1 argument, roll from 1 to arg[0]; arg[0] is max
         else if (argLength === 1) {
-            randomNum = Math.floor(Math.random() * args[0] + 1);
+            maxNum = parseInt(args[0]);
+            
+            console.log("Rolling from 1 to " + maxNum);
+            randomNum = Math.floor(Math.random() * maxNum + 1);
         } 
         // If 2 arguments, roll from min (arg[0]) to max (arg[1])
         else if (argLength === 2) {
-            // Need to convert args[0] into a number so it doesn't append as a string; maybe fix earlier
-            randomNum = (Math.floor (Math.random() * (args[1] - args[0] + 1))) + Number(args[0]);
+            minNum = parseInt(args[0]);
+            maxNum = parseInt(args[1]);
+
+            // If the smaller number is first, swap max and min
+            if (minNum > maxNum) {
+                maxNum = minNum + maxNum;
+                minNum = maxNum - minNum;
+                maxNum = maxNum - minNum;
+            }
+
+            console.log("Rolling from " + minNum + " to " + maxNum);
+            randomNum = (Math.floor (Math.random() * (maxNum - minNum + 1))) + minNum;
         }
 
-        // Send generated number
+        // Send generated number to the channel command was used
         message.channel.send(randomNum);
     }
 });
